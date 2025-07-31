@@ -1,21 +1,150 @@
-<!-- templates/siteblog/home.html -->
 {% extends 'base.html' %}
-{% block title %}Accueil - CopalNews{% endblock %}
+{% load i18n %}
+
+{% block title %}{% trans "Home" %} - CopalNews{% endblock %}
+
 {% block content %}
-    <div class="max-w-4xl mx-auto mt-10 p-6">
-        <h2 class="text-2xl font-bold mb-6">Articles</h2>
-        {% for article in articles %}
-            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                <h3 class="text-xl font-bold mb-2">{{ article.title }}</h3>
-                {% if article.photo %}
-                    <img src="{{ article.photo.url }}" alt="{{ article.title }}" class="w-full h-48 object-cover rounded-lg mb-4">
-                {% endif %}
-                <p class="text-gray-600 mb-2">Publié le {{ article.created_at|date:"d M Y" }} par {{ article.author.username|default:"Anonyme" }}</p>
-                <p class="mb-4">{{ article.content|truncatechars:100 }}</p>
-                <a href="{% url 'article_detail' article.id %}" class="text-blue-500 hover:underline">Voir plus</a>
+    <!-- Hero Section -->
+    <section class="relative bg-blue-900 text-white overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-800 to-blue-600 opacity-95"></div>
+        <div class="container mx-auto px-4 py-32 md:py-40 relative z-10">
+            <div class="max-w-3xl mx-auto text-center animate-fade-in">
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                    {% trans "Discover & Share Amazing Stories" %}
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 text-blue-100">
+                    {% trans "Your premier platform for high-quality articles and news content." %}
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="{% if user.is_authenticated %}{% url 'create_article' %}{% else %}{% url 'register' %}{% endif %}" 
+                       class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold px-8 py-3 rounded-lg transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl">
+                        {% if user.is_authenticated %}
+                            {% trans "Start Writing" %}
+                        {% else %}
+                            {% trans "Join Now" %}
+                        {% endif %}
+                    </a>
+                    <a href="#latest-articles" class="bg-transparent border-2 border-white hover:bg-white hover:text-blue-900 text-white font-bold px-8 py-3 rounded-lg transition-all duration-300 transform hover:-translate-y-1">
+                        {% trans "Explore Articles" %}
+                    </a>
+                </div>
             </div>
-        {% empty %}
-            <p>Aucun article disponible.</p>
-        {% endfor %}
-    </div>
+        </div>
+    </section>
+
+    <!-- Latest Articles Section -->
+    <main id="latest-articles" class="bg-white text-white mx-auto px-4 py-16  ">
+        <div class="text-center mb-16 ">
+            <h2 class="text-3xl md:text-4xl font-bold text-black mb-4">
+                {% trans "Latest Articles" %}
+            </h2>
+            <div class="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
+            <p class="text-lg text-black max-w-3xl mx-auto">
+                {% trans "Discover fresh perspectives and insightful content from our community" %}
+            </p>
+        </div>
+        
+        {% if articles %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for article in articles %}
+                    <article class="bg-white rounded-xl shadow-md overflow-hidden hover-scale transition-all duration-300 animate-fade-in" style="animation-delay: {{ forloop.counter|divisibleby:3|yesno:'0.4s,0.2s,0s' }}">
+                        {% if article.photo %}
+                            <div class="relative h-56 overflow-hidden">
+                                <img src="{{ article.photo.url }}" alt="{{ article.title }}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                                {% if article.category %}
+                                    <span class="absolute top-4 right-4 bg-yellow-500 text-gray-900 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                        {{ article.category.name }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="relative h-56 bg-gray-100 flex items-center justify-center">
+                                <span class="text-gray-400">{% trans "No image" %}</span>
+                                {% if article.category %}
+                                    <span class="absolute top-4 right-4 bg-yellow-500 text-gray-900 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                        {{ article.category.name }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2">{{ article.title }}</h3>
+                            
+                            <p class="text-sm text-gray-500 mb-3">
+                                <span class="font-medium text-gray-700">{{ article.author.username|default:_("Anonymous") }}</span>
+                                <span class="mx-2">•</span>
+                                <span>{{ article.created_at|date:"d M Y" }}</span>
+                            </p>
+                            
+                            <p class="text-gray-600 mb-4 line-clamp-3">
+                                {{ article.content|truncatechars:150 }}
+                            </p>
+                            
+                            <div class="flex justify-between items-center">
+                                <a href="{% url 'article_detail' article.id %}" class="inline-flex items-center text-blue-800 font-medium hover:text-blue-600 transition-colors duration-300">
+                                    {% trans "Read More" %} <i class="fas fa-arrow-right ml-2"></i>
+                                </a>
+                                {% if article.comments_count %}
+                                    <span class="text-sm text-gray-500 flex items-center">
+                                        <i class="far fa-comment mr-1"></i> {{ article.comments_count }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination or View More -->
+            <div class="text-center mt-12">
+                <a href="#" class="inline-block bg-blue-800 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg">
+                    {% trans "View All Articles" %}
+                </a>
+            </div>
+        {% else %}
+            <div class="text-center py-12 bg-white rounded-xl shadow-sm max-w-2xl mx-auto">
+                <div class="text-gray-400 mb-4 text-5xl">
+                    <i class="far fa-newspaper"></i>
+                </div>
+                <p class="text-gray-500 text-lg mb-6">{% trans "No articles available yet." %}</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_article' %}" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold px-8 py-3 rounded-lg transition-all duration-300 inline-block">
+                        {% trans "Be the first to write an article" %}
+                    </a>
+                {% else %}
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <a href="{% url 'register' %}" class="bg-blue-800 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold transition-all duration-300 inline-block">
+                            {% trans "Join Our Community" %}
+                        </a>
+                        <a href="{% url 'login' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-8 py-3 rounded-lg font-bold transition-all duration-300 inline-block">
+                            {% trans "Login" %}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </main>
+
+    <!-- Call to Action Section -->
+    {% if not user.is_authenticated %}
+    <section class="bg-gray-50 py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
+                {% trans "Ready to join our community?" %}
+            </h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+                {% trans "Sign up today to start reading, writing, and connecting with other passionate writers and readers." %}
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{% url 'register' %}" class="bg-blue-800 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold transition-all duration-300 inline-block transform hover:-translate-y-1 shadow-md hover:shadow-lg">
+                    {% trans "Create Free Account" %}
+                </a>
+                <a href="{% url 'login' %}" class="bg-white border-2 border-blue-800 text-blue-800 hover:bg-blue-50 px-8 py-3 rounded-lg font-bold transition-all duration-300 inline-block transform hover:-translate-y-1">
+                    {% trans "Login" %}
+                </a>
+            </div>
+        </div>
+    </section>
+    {% endif %}
 {% endblock %}

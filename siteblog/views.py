@@ -140,11 +140,43 @@ class ArticleDetailView(DetailView):
         return context
     
     
-class DeleteArticleView(LoginRequiredMixin, View):
-    def post(self, request, article_id):
-        article = get_object_or_404(Article, id=article_id, author=request.user, deleted_at__isnull=True)
-        article.soft_delete()
-        return redirect('home')
+class ArticleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Article
+    form_class = ArticleForm
+    template_name = 'siteblog/article_update.html'
+    success_url = reverse_lazy('home')
+
+    def test_func(self):
+        article = self.get_object()
+        return self.request.user == article.author or self.request.user.is_admin
+
+    def handle_no_permission(self):
+        messages.error(self.request, "Vous n'êtes pas autorisé à modifier cet article.")
+        return redirect('article_detail', pk=self.get_object().id)
+
+    def form_valid(self, form):
+        messages.success(self.request, "Article modifié avec succès.")
+        return super().form_valid(form)
+
+
+class ArticleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Article
+    template_name = 'siteblog/article_confirm_delete.html'
+    success_url = reverse_lazy('home')
+
+    def test_func(self):
+        article = self.get_object()
+        return self.request.user == article.author or self.request.user.is_admin
+
+    def handle_no_permission(self):
+        messages.error(self.request, "Vous n'êtes pas autorisé à supprimer cet article.")
+        return redirect('article_detail', pk=self.get_object().id)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.soft_delete()
+        messages.success(self.request, "Article supprimé avec succès.")
+        return redirect(self.success_url)
     
 # siteblog/views.py
 from django.contrib.auth.decorators import login_required

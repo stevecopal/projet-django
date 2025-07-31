@@ -1,33 +1,166 @@
-<!-- templates/siteblog/article_update.html -->
 {% extends 'base.html' %}
-{% block title %}Modifier l'article - CopalNews{% endblock %}
+{% load i18n %}
+
+{% block title %}{% trans "Update Article" %} - CopalNews{% endblock %}
+
 {% block content %}
-    <div class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-        <h2 class="text-2xl font-bold mb-6">Modifier l'article : {{ article.title }}</h2>
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Mettre à jour</button>
-        </form>
-        <div id="photo-preview" class="mt-4">
-            {% if article.photo %}
-                <img src="{{ article.photo.url }}" alt="Photo actuelle" class="w-full h-64 object-cover rounded-lg">
-            {% endif %}
+<div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-extrabold text-gray-900">
+                {% trans "Update Article" %}
+            </h2>
+            <p class="mt-2 text-sm text-gray-600">
+                {% trans "Edit your article content" %}
+            </p>
         </div>
-        <script>
-            document.getElementById('id_photo').addEventListener('change', function(event) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.createElement('img');
-                    preview.src = e.target.result;
-                    preview.className = 'w-full h-64 object-cover rounded-lg';
-                    document.getElementById('photo-preview').innerHTML = '';
-                    document.getElementById('photo-preview').appendChild(preview);
-                };
-                if (event.target.files[0]) {
-                    reader.readAsDataURL(event.target.files[0]);
-                }
-            });
-        </script>
+
+        {% if messages %}
+        <div class="space-y-4 mb-6">
+            {% for message in messages %}
+            <div class="{% if message.tags == 'success' %}bg-green-50 border-l-4 border-green-500{% else %}bg-red-50 border-l-4 border-red-500{% endif %} p-4 rounded">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        {% if message.tags == 'success' %}
+                        <svg class="h-5 w-5 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                        {% else %}
+                        <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm {% if message.tags == 'success' %}text-green-700{% else %}text-red-700{% endif %}">
+                            {{ message }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if form.errors %}
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-red-700">
+                        {% trans "Please correct the errors below." %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Title Field -->
+            <div>
+                <label for="id_title" class="block text-sm font-medium text-gray-700 mb-1">
+                    {% trans "Title" %}
+                </label>
+                <input type="text" name="title" id="id_title" required
+                    class="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                    placeholder="{% trans 'Article title' %}"
+                    value="{{ form.title.value|default:'' }}">
+                {% if form.title.errors %}
+                    <p class="mt-2 text-sm text-red-600">
+                        {{ form.title.errors.as_text }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- Content Field -->
+            <div>
+                <label for="id_content" class="block text-sm font-medium text-gray-700 mb-1">
+                    {% trans "Content" %}
+                </label>
+                <textarea name="content" id="id_content" rows="8" required
+                    class="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                    placeholder="{% trans 'Write your article content here...' %}">{{ form.content.value|default:'' }}</textarea>
+                {% if form.content.errors %}
+                    <p class="mt-2 text-sm text-red-600">
+                        {{ form.content.errors.as_text }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- Category Field -->
+            <div>
+                <label for="id_category" class="block text-sm font-medium text-gray-700 mb-1">
+                    {% trans "Category" %}
+                </label>
+                <select name="category" id="id_category"
+                    class="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm">
+                    {% for value, label in form.category.field.choices %}
+                        <option value="{{ value }}" {% if form.category.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                {% if form.category.errors %}
+                    <p class="mt-2 text-sm text-red-600">
+                        {{ form.category.errors.as_text }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- Photo Field -->
+            <div>
+                <label for="id_photo" class="block text-sm font-medium text-gray-700 mb-1">
+                    {% trans "Featured Image" %}
+                </label>
+                {% if object.photo %}
+                <div class="mb-4">
+                    <img src="{{ object.photo.url }}" alt="Current featured image" class="h-64 w-full object-cover rounded-lg shadow-md">
+                    <p class="mt-2 text-sm text-gray-500">
+                        {% trans "Current image" %}
+                    </p>
+                </div>
+                {% endif %}
+                <input type="file" name="photo" id="id_photo"
+                    class="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm">
+                {% if form.photo.errors %}
+                    <p class="mt-2 text-sm text-red-600">
+                        {{ form.photo.errors.as_text }}
+                    </p>
+                {% endif %}
+                <div id="photo-preview" class="mt-4"></div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <a href="{% url 'article_detail' object.id %}"
+                    class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                    {% trans "Cancel" %}
+                </a>
+                <button type="submit"
+                    class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                    {% trans "Save Changes" %}
+                </button>
+            </div>
+        </form>
     </div>
+</div>
+
+<script>
+    document.getElementById('id_photo').addEventListener('change', function(event) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.createElement('img');
+            preview.src = e.target.result;
+            preview.className = 'w-full h-64 object-cover rounded-lg shadow-md';
+            document.getElementById('photo-preview').innerHTML = '';
+            document.getElementById('photo-preview').appendChild(preview);
+        };
+        if (event.target.files[0]) {
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    });
+</script>
 {% endblock %}

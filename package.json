@@ -1,13 +1,13 @@
 {
-  "name": "nom_de_l_app",
+  "name": "siteblog",
   "version": "3.8.0",
   "description": "",
   "scripts": {
     "start": "npm run dev",
     "build": "npm run build:clean && npm run build:tailwind",
-    "build:clean": "rimraf -i ./copalnews/static/output.css",
-    "build:tailwind": "tailwindcss -i ./copalnews/static/input.css -o ./copalnews/static/output.css",
-    "dev": "tailwindcss -i ./copalnews/static/input.css -o ./copalnews/static/output.css --watch",
+    "build:clean": "rimraf -i ./static/output.css",
+    "build:tailwind": "tailwindcss -i ./static/input.css -o ./static/output.css",
+    "dev": "tailwindcss -i ./static/input.css -o ./static/output.css --watch",
     "tailwindcss": "node ./node_modules/tailwindcss/lib/cli.js"
   },
   "devDependencies": {

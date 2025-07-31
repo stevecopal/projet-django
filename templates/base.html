@@ -1,37 +1,246 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>{% block title %}CopalNews{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% trans "CopalNews" %}{% endblock %}</title>
     <link href="{% static 'output.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        .nav-link::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: #FFD700;
+            transition: width 0.3s;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .hover-scale {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-scale:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-blue-500 text-white p-4">
-        <a href="{% url 'home' %}" class="mr-4">Accueil</a>
-        {% if user.is_authenticated %}
-            <a href="{% url 'create_article' %}" class="mr-4">Créer un article</a>
-            {% if user.is_admin %}
-                <a href="{% url 'manage_categories' %}" class="mr-4">Gérer les catégories</a>
-                <a href="{% url 'manage_users' %}" class="mr-4">Gérer les utilisateurs</a>
-            {% endif %}
-            <a href="{% url 'logout' %}">Déconnexion</a>
-        {% else %}
-            <a href="{% url 'login' %}" class="mr-4">Connexion</a>
-            <a href="{% url 'register' %}">Inscription</a>
-        {% endif %}
-    </nav>
-    <div class="container mx-auto p-6">
-        {% if messages %}
-            <div class="mb-4">
-                {% for message in messages %}
-                    <div class="{% if message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %} p-4 rounded">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+<body class="bg-gray-50 font-sans antialiased text-gray-900">
+    <!-- Sticky Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-white shadow-md transition-all duration-300">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="{% url 'home' %}" class="flex items-center space-x-2 group">
+                <img src="{% static 'img/logo.png' %}" alt="{% trans 'CopalNews Logo' %}" class="h-11 w-auto transition-transform duration-300 group-hover:scale-110">
+                <span class="text-xl font-bold text-blue-800 group-hover:text-blue-600 transition-colors duration-300">{% trans "CopalNews" %}</span>
+            </a>
+            
+            <!-- Navigation Links -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="{% url 'home' %}" class="nav-link relative font-medium text-gray-700 hover:text-blue-800 transition-colors duration-300 text-lg">
+                    {% trans "Home" %}
+                </a>
+                
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_article' %}" class="nav-link relative font-medium text-gray-700 hover:text-blue-800 transition-colors duration-300 text-lg">
+                        {% trans "Create Article" %}
+                    </a>
+                    
+                    {% if user.is_admin %}
+                        <a href="{% url 'manage_categories' %}" class="nav-link relative font-medium text-gray-700 hover:text-blue-800 transition-colors duration-300 text-lg">
+                            {% trans "Manage Categories" %}
+                        </a>
+                        <a href="{% url 'manage_users' %}" class="nav-link relative font-medium text-gray-700 hover:text-blue-800 transition-colors duration-300 text-lg">
+                            {% trans "Manage Users" %}
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'logout' %}" class="nav-link relative font-medium text-gray-700 hover:text-blue-800 transition-colors duration-300 text-lg">
+                        {% trans "Logout" %}
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="nav-link relative font-medium text-gray-700 hover:text-blue-800 transition-colors duration-300 text-lg">
+                        {% trans "Login" %}
+                    </a>
+                    <a href="{% url 'register' %}" class="bg-blue-800 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 hover:shadow-lg text-lg">
+                        {% trans "Register" %}
+                    </a>
+                {% endif %}
             </div>
+            
+            <!-- Mobile menu button -->
+            <button class="md:hidden text-gray-700 focus:outline-none" id="mobile-menu-button">
+                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile menu -->
+        <div class="md:hidden hidden bg-white shadow-lg" id="mobile-menu">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-4">
+                <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-800 transition-colors duration-300 text-lg py-2 border-b border-gray-100">
+                    {% trans "Home" %}
+                </a>
+                
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_article' %}" class="text-gray-700 hover:text-blue-800 transition-colors duration-300 text-lg py-2 border-b border-gray-100">
+                        {% trans "Create Article" %}
+                    </a>
+                    
+                    {% if user.is_admin %}
+                        <a href="{% url 'manage_categories' %}" class="text-gray-700 hover:text-blue-800 transition-colors duration-300 text-lg py-2 border-b border-gray-100">
+                            {% trans "Manage Categories" %}
+                        </a>
+                        <a href="{% url 'manage_users' %}" class="text-gray-700 hover:text-blue-800 transition-colors duration-300 text-lg py-2 border-b border-gray-100">
+                            {% trans "Manage Users" %}
+                        </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'logout' %}" class="text-gray-700 hover:text-blue-800 transition-colors duration-300 text-lg py-2 border-b border-gray-100">
+                        {% trans "Logout" %}
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-gray-700 hover:text-blue-800 transition-colors duration-300 text-lg py-2 border-b border-gray-100">
+                        {% trans "Login" %}
+                    </a>
+                    <a href="{% url 'register' %}" class="bg-blue-800 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 text-center">
+                        {% trans "Register" %}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages Section -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="{% if message.tags == 'success' %}bg-green-50 border-l-4 border-green-500 text-green-700{% else %}bg-red-50 border-l-4 border-red-500 text-red-700{% endif %} p-4 mb-4 rounded-r-lg shadow-sm animate-fade-in">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 pt-0.5">
+                            {% if message.tags == 'success' %}
+                                <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                            {% else %}
+                                <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+                            {% endif %}
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium">{{ message }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
         {% endif %}
+
+    <!-- Main Content -->
+    <main class="min-h-screen">
         {% block content %}
+        
         {% endblock %}
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <div>
+                    <a href="{% url 'home' %}" class="flex items-center text-2xl font-bold mb-6 group">
+                        <img src="{% static 'img/logo.png' %}" alt="{% trans 'CopalNews Logo' %}" class="h-11 w-auto transition-transform duration-300 group-hover:scale-110">
+                        <span class="group-hover:text-yellow-500 transition-colors duration-300">CopalNews</span>
+                    </a>
+                    <p class="text-gray-400 mb-6">
+                        {% trans "Empowering writers and readers to share knowledge, stories, and perspectives since 2023." %}
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300 text-xl">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300 text-xl">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300 text-xl">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300 text-xl">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-6 text-white uppercase tracking-wider">{% trans "Quick Links" %}</h4>
+                    <ul class="space-y-3">
+                        <li><a href="{% url 'home' %}" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300">{% trans "Home" %}</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300">{% trans "About Us" %}</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300">{% trans "Articles" %}</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300">{% trans "Popular Topics" %}</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300">{% trans "Featured Writers" %}</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-6 text-white uppercase tracking-wider">{% trans "Company" %}</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300">{% trans "Our Team" %}</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300">{% trans "Careers" %}</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300">{% trans "Privacy Policy" %}</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300">{% trans "Terms of Service" %}</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-yellow-500 transition-colors duration-300">{% trans "Contact Us" %}</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-6 text-white uppercase tracking-wider">{% trans "Newsletter" %}</h4>
+                    <p class="text-gray-400 mb-4">
+                        {% trans "Subscribe to our newsletter to get the latest articles and updates." %}
+                    </p>
+                    <form class="flex flex-col space-y-3">
+                        <input type="email" placeholder="{% trans 'Your email address' %}" class="px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                        <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold px-6 py-3 rounded-lg transition-all duration-300">
+                            {% trans "Subscribe" %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 text-center text-gray-500">
+                <p>&copy; 2025 {% trans "CopalNews. All rights reserved." %}</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg');
+                navbar.classList.add('py-2');
+                navbar.classList.remove('py-3');
+            } else {
+                navbar.classList.remove('shadow-lg');
+                navbar.classList.add('py-3');
+                navbar.classList.remove('py-2');
+            }
+        });
+    </script>
 </body>
 </html>

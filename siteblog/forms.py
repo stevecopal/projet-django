@@ -12,12 +12,18 @@ class RegistrationForm(forms.ModelForm):
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100)
     password = forms.CharField(widget=forms.PasswordInput)
+    
 
 class ArticleForm(forms.ModelForm):
     class Meta:
         model = Article
-        fields = ['title', 'content', 'photo', 'category']
-        widgets = {'category': forms.Select(attrs={'required': False})}
+        fields = ['title', 'content', 'category', 'photo']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'w-full p-2 border rounded'}),
+            'content': forms.Textarea(attrs={'class': 'w-full p-2 border rounded'}),
+            'category': forms.Select(attrs={'class': 'w-full p-2 border rounded'}),
+            'photo': forms.FileInput(attrs={'class': 'w-full p-2 border rounded'}),
+        }
         
 class CategoryForm(forms.ModelForm):
     class Meta:
