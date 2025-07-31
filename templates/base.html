@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}CopalNews{% endblock %}</title>
+    <link href="{% static 'output.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-blue-500 text-white p-4">
+        <a href="{% url 'home' %}" class="mr-4">Accueil</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'create_article' %}" class="mr-4">Créer un article</a>
+            {% if user.is_admin %}
+                <a href="{% url 'manage_categories' %}" class="mr-4">Gérer les catégories</a>
+                <a href="{% url 'manage_users' %}" class="mr-4">Gérer les utilisateurs</a>
+            {% endif %}
+            <a href="{% url 'logout' %}">Déconnexion</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="mr-4">Connexion</a>
+            <a href="{% url 'register' %}">Inscription</a>
+        {% endif %}
+    </nav>
+    <div class="container mx-auto p-6">
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="{% if message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %} p-4 rounded">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

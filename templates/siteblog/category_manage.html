@@ -1,0 +1,20 @@
+<!-- templates/siteblog/category_manage.html -->
+{% extends 'base.html' %}
+{% block title %}Gérer les catégories - CopalNews{% endblock %}
+{% block content %}
+    <div class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6">Gérer les catégories</h2>
+        <a href="{% url 'create_category' %}" class="bg-blue-500 text-white py-2 px-4 rounded mb-4 inline-block">Créer une catégorie</a>
+        <ul>
+            {% for category in categories %}
+                <li class="mb-2">
+                    {{ category.name }}
+                    <a href="{% url 'update_category' category.id %}" class="text-blue-500 ml-2">Modifier</a>
+                    <a href="{% url 'delete_confirm_category' category.id %}" class="text-red-500 ml-2">Supprimer</a>
+                </li>
+            {% empty %}
+                <li>Aucune catégorie disponible.</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

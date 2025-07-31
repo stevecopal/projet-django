@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+.py[cod]
+.pyo
+.pyd
+.Python
+.egg-info/
+dist/
+build/
+
+# Django
+.log
+.pot
+.pyc
+migrations/
+.sqlite3
+
+
+# Environnement virtuel
+venv/
+env/
+virtualenv/
+ENV/
+virtuel/
+# Fichiers sensibles
+.env
+.env
+.secret
+.key
+
+# IDE
+.idea/
+.vscode/
+
+# Bases de données
+.db.sqlite3
+.sql
+
+# Cache et temporaires
+.cache
+.bak
+.swp
+~
+
+# Système
+.DS_Store
+Thumbs.db
+node_modules/

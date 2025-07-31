@@ -1,0 +1,21 @@
+<!-- templates/siteblog/user_confirm_delete.html -->
+{% extends 'base.html' %}
+{% block title %}Supprimer un utilisateur - CopalNews{% endblock %}
+{% block content %}
+    <div class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6">Supprimer un utilisateur</h2>
+        <p>Êtes-vous sûr de vouloir supprimer l'utilisateur "{{ object.username }}" ?</p>
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="bg-green-100 text-green-700 p-4 rounded {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Confirmer</button>
+            <a href="{% url 'manage_users' %}" class="bg-gray-500 text-white py-2 px-4 rounded ml-2">Annuler</a>
+        </form>
+    </div>
+{% endblock %}

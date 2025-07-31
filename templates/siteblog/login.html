@@ -1,0 +1,35 @@
+<!-- templates/siteblog/login.html -->
+{% extends 'base.html' %}
+{% block title %}Connexion - CopalNews{% endblock %}
+{% block content %}
+    <div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6">Connexion</h2>
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="{% if message.tags == 'success' %}bg-green-100 text-green-700{% else %}bg-red-100 text-red-700{% endif %} p-4 rounded">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if form.errors %}
+            <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Se connecter</button>
+        </form>
+        <p class="mt-4">Pas de compte ? <a href="{% url 'register' %}" class="text-blue-500">Inscrivez-vous</a></p>
+        <p class="mt-2"><a href="{% url 'password_reset_request' %}" class="text-blue-500">Mot de passe oublié ?</a></p>
+    </div>
+{% endblock %}

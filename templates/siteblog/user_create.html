@@ -1,0 +1,32 @@
+<!-- templates/siteblog/user_create.html -->
+{% extends 'base.html' %}
+{% block title %}Créer un utilisateur - CopalNews{% endblock %}
+{% block content %}
+    <div class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6">Créer un utilisateur</h2>
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="bg-green-100 text-green-700 p-4 rounded {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if form.errors %}
+            <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Créer</button>
+            <a href="{% url 'manage_users' %}" class="bg-gray-500 text-white py-2 px-4 rounded ml-2">Annuler</a>
+        </form>
+    </div>
+{% endblock %}

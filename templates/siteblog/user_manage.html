@@ -1,0 +1,46 @@
+<!-- templates/siteblog/user_manage.html -->
+{% extends 'base.html' %}
+{% block title %}Gérer les utilisateurs - CopalNews{% endblock %}
+{% block content %}
+    <div class="max-w-4xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6">Gérer les utilisateurs</h2>
+        <p class="mb-4">Nombre d'utilisateurs inscrits : {{ user_count }}</p>
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="bg-green-100 text-green-700 p-4 rounded {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <a href="{% url 'create_user' %}" class="bg-blue-500 text-white py-2 px-4 rounded mb-4 inline-block">Créer un utilisateur</a>
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border p-2">Nom d'utilisateur</th>
+                    <th class="border p-2">Email</th>
+                    <th class="border p-2">Administrateur</th>
+                    <th class="border p-2">Actif</th>
+                    <th class="border p-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td class="border p-2">{{ user.username }}</td>
+                        <td class="border p-2">{{ user.email }}</td>
+                        <td class="border p-2">{{ user.is_admin|yesno:"Oui,Non" }}</td>
+                        <td class="border p-2">{{ user.is_active|yesno:"Oui,Non" }}</td>
+                        <td class="border p-2">
+                            <a href="{% url 'update_user' user.id %}" class="text-blue-500 mr-2">Modifier</a>
+                            <a href="{% url 'delete_user' user.id %}" class="text-red-500">Supprimer</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="border p-2 text-center">Aucun utilisateur disponible.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

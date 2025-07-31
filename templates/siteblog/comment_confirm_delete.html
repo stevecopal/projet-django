@@ -1,0 +1,16 @@
+<!-- templates/site)|^
+
+System: <!-- templates/siteblog/comment_confirm_delete.html -->
+{% extends 'base.html' %}
+{% block title %}Supprimer un commentaire - CopalNews{% endblock %}
+{% block content %}
+    <div class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6">Supprimer un commentaire</h2>
+        <p>Êtes-vous sûr de vouloir supprimer ce commentaire ?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600">Confirmer</button>
+            <a href="{% url 'article_detail' object.article.id %}" class="bg-gray-500 text-white py-2 px-4 rounded ml-2">Annuler</a>
+        </form>
+    </div>
+{% endblock %}

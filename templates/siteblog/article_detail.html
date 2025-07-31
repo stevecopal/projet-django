@@ -1,0 +1,43 @@
+<!-- templates/siteblog/article_detail.html -->
+{% extends 'base.html' %}
+{% block title %}{{ article.title }} - CopalNews{% endblock %}
+{% block content %}
+    <div class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-4">{{ article.title }}</h2>
+        {% if article.photo %}
+            <img src="{{ article.photo.url }}" alt="{{ article.title }}" class="w-full h-64 object-cover rounded-lg mb-4">
+        {% endif %}
+        <p class="text-gray-600 mb-2">Publié le {{ article.created_at|date:"d M Y" }} par {{ article.author.username|default:"Anonyme" }}</p>
+        <p class="mb-4">{{ article.content }}</p>
+        {% if user.is_authenticated and user == article.author or user.is_admin %}
+            <a href="{% url 'update_article' article.id %}" class="text-blue-500 mr-2">Modifier</a>
+            <a href="{% url 'delete_article' article.id %}" class="text-red-500">Supprimer</a>
+        {% endif %}
+        
+        <h3 class="text-xl font-bold mt-6 mb-4">Commentaires</h3>
+        {% for commentaire in commentaires %}
+            <div class="border-t pt-4 mt-4">
+                <p>{{ commentaire.content }}</p>
+                <p class="text-gray-600 text-sm">Par {{ commentaire.author.username|default:"Anonyme" }} le {{ commentaire.created_at|date:"d M Y H:i" }}</p>
+                {% if user.is_authenticated and user == commentaire.author or user.is_admin %}
+                    <a href="{% url 'comment_update' commentaire.id %}" class="text-blue-500 mr-2">Modifier</a>
+                    <a href="{% url 'comment_delete' commentaire.id %}" class="text-red-500">Supprimer</a>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>Aucun commentaire pour le moment.</p>
+        {% endfor %}
+        
+        <h3 class="text-xl font-bold mt-6 mb-4">Ajouter un commentaire</h3>
+        {% if comment_form %}
+            <p class="text-green-600">Formulaire présent</p>
+            <form method="post" action="{% url 'comment_create' article.id %}">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Commenter</button>
+            </form>
+        {% else %}
+            <p class="text-red-600">Formulaire manquant</p>
+        {% endif %}
+    </div>
+{% endblock %}

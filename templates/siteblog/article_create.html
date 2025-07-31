@@ -1,0 +1,40 @@
+<!-- templates/siteblog/article_create.html -->
+{% extends 'base.html' %}
+{% block title %}Créer un article - CopalNews{% endblock %}
+{% block content %}
+    <div class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6">Créer un article</h2>
+        {% if form.errors %}
+            <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Publier</button>
+        </form>
+        <div id="photo-preview" class="mt-4"></div>
+        <script>
+            document.getElementById('id_photo').addEventListener('change', function(event) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.createElement('img');
+                    preview.src = e.target.result;
+                    preview.className = 'w-full h-64 object-cover rounded-lg';
+                    document.getElementById('photo-preview').innerHTML = '';
+                    document.getElementById('photo-preview').appendChild(preview);
+                };
+                if (event.target.files[0]) {
+                    reader.readAsDataURL(event.target.files[0]);
+                }
+            });
+        </script>
+    </div>
+{% endblock %}

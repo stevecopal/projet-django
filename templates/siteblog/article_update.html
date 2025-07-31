@@ -1,0 +1,33 @@
+<!-- templates/siteblog/article_update.html -->
+{% extends 'base.html' %}
+{% block title %}Modifier l'article - CopalNews{% endblock %}
+{% block content %}
+    <div class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-6">Modifier l'article : {{ article.title }}</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Mettre à jour</button>
+        </form>
+        <div id="photo-preview" class="mt-4">
+            {% if article.photo %}
+                <img src="{{ article.photo.url }}" alt="Photo actuelle" class="w-full h-64 object-cover rounded-lg">
+            {% endif %}
+        </div>
+        <script>
+            document.getElementById('id_photo').addEventListener('change', function(event) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.createElement('img');
+                    preview.src = e.target.result;
+                    preview.className = 'w-full h-64 object-cover rounded-lg';
+                    document.getElementById('photo-preview').innerHTML = '';
+                    document.getElementById('photo-preview').appendChild(preview);
+                };
+                if (event.target.files[0]) {
+                    reader.readAsDataURL(event.target.files[0]);
+                }
+            });
+        </script>
+    </div>
+{% endblock %}
