@@ -9,7 +9,7 @@ Projet de blog Django avec fonctionnalités de connexion, inscription, réinitia
 
 ## Installation
 1. Cloner le dépôt :
-   git clone https://github.com/ton-username/copalnews.git
+   https://github.com/stevecopal/projet-django.git
    cd copalnews
 
 Créer et activer un environnement virtuel :
