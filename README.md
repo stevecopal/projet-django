@@ -16,11 +16,13 @@ Projet de blog Django avec fonctionnalités de connexion, inscription, réinitia
 
 Créer et activer un environnement virtuel :
 
-python3 -m venv venv
+python3 -m venv virtuel
 
-source venv/bin/activate  # Linux/Mac
+activer l'environnement virtuel
 
-venv\Scripts\activate  # Windows
+source virtuel/bin/activate  # Linux/Mac
+
+virtuel\Scripts\activate  # Windows
 
 Installer les dépendances Python :
 
@@ -28,7 +30,7 @@ pip install -r requirements.txt
 
 Configurer la base de données PostgreSQL :
 
-Créer une base de données blog_db.
+Créer une base de données copalnews.
 
 Ajouter un fichier .env avec :
 
