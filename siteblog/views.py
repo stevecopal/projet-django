@@ -4,7 +4,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin , UserPassesTestMixin
 from django.shortcuts import redirect, get_object_or_404 , render
 from django.urls import reverse_lazy
-from .forms import RegistrationForm, LoginForm, ArticleForm
+from .forms import RegisterForm, LoginForm, ArticleForm
 from .models import Article, CustomUser ,Category ,Commentaire
 from .auth_backends import CustomAuthBackend
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin 
@@ -29,19 +29,35 @@ class HomeView(ListView):
     
 
 
-class RegisterForm(forms.Form):
-    username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'w-full p-2 border rounded'}))
-    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'w-full p-2 border rounded'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'w-full p-2 border rounded'}))
-    password_confirm = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'w-full p-2 border rounded'}), label="Confirmer le mot de passe")
+class RegisterView(View):
+    template_name = 'siteblog/register.html'
+    form_class = RegisterForm
 
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        password_confirm = cleaned_data.get('password_confirm')
-        if password and password_confirm and password != password_confirm:
-            raise forms.ValidationError("Les mots de passe ne correspondent pas.")
-        return cleaned_data
+    def get(self, request):
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            try:
+                user = CustomUser.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password
+                )
+                messages.success(request, "Inscription réussie. Veuillez vous connecter.")
+                return redirect('login')
+            except ValueError as e:
+                messages.error(request, f"Erreur lors de l'inscription : {str(e)}")
+            except Exception as e:
+                messages.error(request, "Une erreur inattendue s'est produite. Veuillez réessayer.")
+        else:
+            messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
+        return render(request, self.template_name, {'form': form})
     
 class RegisterView(View):
     template_name = 'siteblog/register.html'

@@ -2,12 +2,22 @@
 from django import forms
 from .models import CustomUser, Article, Category , Commentaire
 
-class RegistrationForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
+class RegisterForm(forms.Form):
+    username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'class': 'appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm'}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm'}))
 
-    class Meta:
-        model = CustomUser
-        fields = ['username', 'email', 'password']
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if CustomUser.objects.filter(username=username, deleted_at__isnull=True).exists():
+            raise forms.ValidationError("Ce nom d'utilisateur est déjà pris.")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if CustomUser.objects.filter(email=email, deleted_at__isnull=True).exists():
+            raise forms.ValidationError("Cet email est déjà utilisé.")
+        return email
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=100)

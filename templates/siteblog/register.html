@@ -18,6 +18,16 @@
             </p>
         </div>
 
+        {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                    <div class="{% if message.tags == 'success' %}bg-green-50 border-l-4 border-green-500 text-green-700{% else %}bg-red-50 border-l-4 border-red-500 text-red-700{% endif %} p-4 rounded">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         {% if form.errors %}
         <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
             <div class="flex">
@@ -30,6 +40,13 @@
                     <p class="text-sm text-red-700">
                         {% trans "Please correct the errors below." %}
                     </p>
+                    <ul class="mt-2 text-sm text-red-700">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
@@ -45,7 +62,7 @@
                     </label>
                     <input id="username" name="username" type="text" required
                         class="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                        placeholder="{% trans 'Choose a username' %}"
+                        placeholder="{% trans 'Your username' %}"
                         {% if form.username.value %}value="{{ form.username.value }}"{% endif %}>
                     {% if form.username.errors %}
                         <p class="mt-2 text-sm text-red-600">
@@ -84,14 +101,6 @@
                         </p>
                     {% endif %}
                 </div>
-            </div>
-
-            <div class="flex items-center">
-                <input id="terms" name="terms" type="checkbox" required
-                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                <label for="terms" class="ml-2 block text-sm text-gray-900">
-                    {% trans "I agree to the" %} <a href="#" class="text-blue-600 hover:text-blue-500">{% trans "Terms of Service" %}</a> {% trans "and" %} <a href="#" class="text-blue-600 hover:text-blue-500">{% trans "Privacy Policy" %}</a>
-                </label>
             </div>
 
             <div>

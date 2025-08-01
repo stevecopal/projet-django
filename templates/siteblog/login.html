@@ -4,19 +4,29 @@
 {% block title %}{% trans "Login" %} - CopalNews{% endblock %}
 
 {% block content %}
-<div class="min-h-screen flex items-center justify-center  py-12 px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg">
         <div class="text-center">
             <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
                 {% trans "Sign in to your account" %}
             </h2>
             <p class="mt-2 text-sm text-gray-600">
-                {% trans "Or" %}
+                {% trans "Don't have an account?" %}
                 <a href="{% url 'register' %}" class="font-medium text-blue-600 hover:text-blue-500">
-                    {% trans "create a new account" %}
+                    {% trans "Register" %}
                 </a>
             </p>
         </div>
+
+        {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                    <div class="{% if message.tags == 'success' %}bg-green-50 border-l-4 border-green-500 text-green-700{% else %}bg-red-50 border-l-4 border-red-500 text-red-700{% endif %} p-4 rounded">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         {% if form.errors %}
         <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
@@ -30,6 +40,13 @@
                     <p class="text-sm text-red-700">
                         {% trans "Please correct the errors below." %}
                     </p>
+                    <ul class="mt-2 text-sm text-red-700">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
                 </div>
             </div>
         </div>
@@ -37,7 +54,6 @@
 
         <form class="mt-8 space-y-6" method="post">
             {% csrf_token %}
-            <input type="hidden" name="remember" value="true">
             <div class="rounded-md shadow-sm space-y-4">
                 <!-- Username Field -->
                 <div>
@@ -46,7 +62,7 @@
                     </label>
                     <input id="username" name="username" type="text" required
                         class="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                        placeholder="{% trans 'Enter your username' %}"
+                        placeholder="{% trans 'Your username' %}"
                         {% if form.username.value %}value="{{ form.username.value }}"{% endif %}>
                     {% if form.username.errors %}
                         <p class="mt-2 text-sm text-red-600">
@@ -62,7 +78,7 @@
                     </label>
                     <input id="password" name="password" type="password" required
                         class="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                        placeholder="{% trans 'Enter your password' %}">
+                        placeholder="{% trans 'Your password' %}">
                     {% if form.password.errors %}
                         <p class="mt-2 text-sm text-red-600">
                             {{ form.password.errors.as_text }}
@@ -71,28 +87,12 @@
                 </div>
             </div>
 
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <input id="remember-me" name="remember-me" type="checkbox"
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                    <label for="remember-me" class="ml-2 block text-sm text-gray-900">
-                        {% trans "Remember me" %}
-                    </label>
-                </div>
-
-                <div class="text-sm">
-                    <a href="{% url 'password_reset_request' %}" class="font-medium text-blue-600 hover:text-blue-500">
-                        {% trans "Forgot your password?" %}
-                    </a>
-                </div>
-            </div>
-
             <div>
                 <button type="submit"
                     class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
                     <span class="absolute left-0 inset-y-0 flex items-center pl-3">
                         <svg class="h-5 w-5 text-blue-300 group-hover:text-blue-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                         </svg>
                     </span>
                     {% trans "Sign in" %}
@@ -107,15 +107,15 @@
                 </div>
                 <div class="relative flex justify-center text-sm">
                     <span class="px-2 bg-white text-gray-500">
-                        {% trans "New to CopalNews?" %}
+                        {% trans "Forgot your password?" %}
                     </span>
                 </div>
             </div>
 
             <div class="mt-6">
-                <a href="{% url 'register' %}"
+                <a href="{% url 'password_reset_request' %}"
                     class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
-                    {% trans "Create new account" %}
+                    {% trans "Reset password" %}
                 </a>
             </div>
         </div>

@@ -33,13 +33,13 @@
     </section>
 
     <!-- Latest Articles Section -->
-    <main id="latest-articles" class="bg-white text-white mx-auto px-4 py-16  ">
-        <div class="text-center mb-16 ">
-            <h2 class="text-3xl md:text-4xl font-bold text-black mb-4">
+    <main id="latest-articles" class="container mx-auto px-4 py-16">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
                 {% trans "Latest Articles" %}
             </h2>
-            <div class="w-20 h-1 bg-blue-500 mx-auto mb-6"></div>
-            <p class="text-lg text-black max-w-3xl mx-auto">
+            <div class="w-20 h-1 bg-yellow-500 mx-auto mb-6"></div>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
                 {% trans "Discover fresh perspectives and insightful content from our community" %}
             </p>
         </div>
@@ -47,28 +47,32 @@
         {% if articles %}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for article in articles %}
-                    <article class="bg-white rounded-xl shadow-md overflow-hidden hover-scale transition-all duration-300 animate-fade-in" style="animation-delay: {{ forloop.counter|divisibleby:3|yesno:'0.4s,0.2s,0s' }}">
-                        {% if article.photo %}
-                            <div class="relative h-56 overflow-hidden">
-                                <img src="{{ article.photo.url }}" alt="{{ article.title }}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
-                                {% if article.category %}
-                                    <span class="absolute top-4 right-4 bg-yellow-500 text-gray-900 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                                        {{ article.category.name }}
-                                    </span>
-                                {% endif %}
-                            </div>
-                        {% else %}
-                            <div class="relative h-56 bg-gray-100 flex items-center justify-center">
-                                <span class="text-gray-400">{% trans "No image" %}</span>
-                                {% if article.category %}
-                                    <span class="absolute top-4 right-4 bg-yellow-500 text-gray-900 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                                        {{ article.category.name }}
-                                    </span>
-                                {% endif %}
-                            </div>
-                        {% endif %}
+                    <article class="bg-white rounded-xl shadow-md overflow-hidden hover-scale transition-all duration-300 animate-fade-in flex flex-col" style="animation-delay: {{ forloop.counter|divisibleby:3|yesno:'0.4s,0.2s,0s' }}">
+                        <!-- Image and content container - stays together -->
+                        <div class="flex-grow-0">
+                            {% if article.photo %}
+                                <div class="relative h-56 overflow-hidden">
+                                    <img src="{{ article.photo.url }}" alt="{{ article.title }}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                                    {% if article.category %}
+                                        <span class="absolute top-4 right-4 bg-yellow-500 text-gray-900 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                            {{ article.category.name }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="relative h-56 bg-gray-100 flex items-center justify-center">
+                                    <span class="text-gray-400">{% trans "No image" %}</span>
+                                    {% if article.category %}
+                                        <span class="absolute top-4 right-4 bg-yellow-500 text-gray-900 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                                            {{ article.category.name }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
                         
-                        <div class="p-6">
+                        <!-- Content that stays with the image -->
+                        <div class="p-6 flex flex-col flex-grow">
                             <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2">{{ article.title }}</h3>
                             
                             <p class="text-sm text-gray-500 mb-3">
@@ -77,11 +81,11 @@
                                 <span>{{ article.created_at|date:"d M Y" }}</span>
                             </p>
                             
-                            <p class="text-gray-600 mb-4 line-clamp-3">
+                            <p class="text-gray-600 mb-4 line-clamp-3 flex-grow">
                                 {{ article.content|truncatechars:150 }}
                             </p>
                             
-                            <div class="flex justify-between items-center">
+                            <div class="flex justify-between items-center mt-auto">
                                 <a href="{% url 'article_detail' article.id %}" class="inline-flex items-center text-blue-800 font-medium hover:text-blue-600 transition-colors duration-300">
                                     {% trans "Read More" %} <i class="fas fa-arrow-right ml-2"></i>
                                 </a>
